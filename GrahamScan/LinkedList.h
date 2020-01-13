@@ -129,10 +129,8 @@ public:
 			List_Node<T>* temp;
 
 			if (size == 1)
-			{
 				delete tail;
-				head = tail = nullptr;
-			}
+			//head = tail = nullptr;
 			else
 			{
 				temp = head->next;
@@ -159,10 +157,8 @@ public:
 			List_Node<T>* temp;
 
 			if (size == 1)
-			{
 				delete head;
-				head = tail = nullptr;
-			}
+			//head = tail = nullptr;
 			else
 			{
 				temp = tail->previous;
@@ -190,17 +186,8 @@ public:
 			List_Node<T>* temp;
 
 			if (size == 1)
-			{
 				delete head;
-				head = tail = nullptr;
-			}
-			else if (size == 2)
-			{
-				temp = head;
-				tail->previous = nullptr;
-				head = tail;
-				delete temp;
-			}
+			//head = tail = nullptr;
 			else
 			{
 				temp = tail->previous;
