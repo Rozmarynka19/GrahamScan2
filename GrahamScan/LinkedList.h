@@ -205,7 +205,7 @@ public:
 		}
 	}
 
-	string GetDataOfElement(int iterator)
+	string GetDataOfElementToString(int iterator)
 	{
 
 		if (iterator<0 || iterator>size - 1)
@@ -222,6 +222,28 @@ public:
 			}
 
 			return temp->ToString();
+			//cout <<  << endl;
+		}
+
+	}
+
+	T GetDataOfElement(int iterator)
+	{
+
+		if (iterator<0 || iterator>size - 1)
+			cout << "\nWrong iterator - out of range.";
+		else if (iterator == size - 1) return tail;//return ToString(tail);//cout << tail->data << endl;
+		else if (iterator == 0) return head;//return ToString(head);//cout << head->data << endl;
+		else
+		{
+			List_Node<T>* temp = head;
+
+			for (int i = 0; i < iterator; i++)
+			{
+				temp = temp->next;
+			}
+
+			return temp;
 			//cout <<  << endl;
 		}
 
