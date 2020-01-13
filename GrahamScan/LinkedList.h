@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 using namespace std;
 
 
@@ -52,6 +53,7 @@ template <class T>
 class Linked_List
 {
 	friend class Graph;
+	template <class T> friend class BinaryHeap;
 
 	List_Node<T>* head;
 	List_Node<T>* tail;
@@ -74,6 +76,49 @@ public:
 		delete tail;*/
 	}
 
+	void Swap(int index1, int index2)
+	{
+		T temp = GetDataOfElement(index1);
+		ReplaceData(index1, GetDataOfElement(index2));
+		ReplaceData(index2, temp);
+	}
+
+	T* FindStartPoint()
+	{
+		if (size == 0)
+		{
+			cout << "The list is empty!" << endl;
+			return nullptr;
+		}
+
+		List_Node<T>* StartPoint = head;
+
+		if (size == 1) return &(head->data);
+
+		List_Node<T> * temp = head->next;
+		while (temp)
+		{
+			if (temp->data.y < StartPoint->data.y) StartPoint = temp;
+			else if (temp->data.y == StartPoint->data.y)
+			{
+				if(temp->data.x < StartPoint->data.x) StartPoint = temp;
+			}
+			temp = temp->next;
+		}
+
+		return &(StartPoint->data);
+	}
+
+	void NewCoordinatesSystem(T * StartPoint)
+	{
+		List_Node<T>* temp = head;
+
+		while (temp)
+		{
+			temp->data = temp->data - *StartPoint;
+			temp = temp->next;
+		}
+	}
 
 	//add node to the end of the list
 	void addToTail(T data)

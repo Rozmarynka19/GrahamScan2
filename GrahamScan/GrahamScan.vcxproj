@@ -156,7 +156,9 @@
     <ClCompile Include="Point.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DynamicArray.h" />
     <ClInclude Include="Graph.h" />
+    <ClInclude Include="HeapSort.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="Point.h" />
   </ItemGroup>

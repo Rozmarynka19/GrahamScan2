@@ -1,4 +1,3 @@
-#include <iostream>
 //#include <iomanip>
 #include <string>
 #include <fstream>
@@ -22,6 +21,31 @@ Graph::~Graph()
 {
 	delete listOfPoints;
 	delete listOfEdges;
+}
+//unsigned int Graph::GetListOfPointsSize()
+//{
+//	return listOfPoints->GetSize();
+//}
+//unsigned int Graph::GetListOfEdgesSize()
+//{
+//	return listOfEdges->GetSize();
+//}
+void Graph::CopyListOfPoints(Linked_List<Point>* LinkedList)
+{
+	for (int i = 0; i < listOfPoints->GetSize(); i++)
+	{
+		LinkedList->addToTail(listOfPoints->GetDataOfElement(i));
+	}
+}
+void Graph::Print()
+{
+	List_Node<Point>* tmp = listOfEdges->head;
+	for (int i = 0; i < listOfEdges->size; i++)
+	{
+		cout << tmp->data.x << "\t" << tmp->data.y << endl;
+		tmp = tmp->next;
+		getchar();
+	}
 }
 void Graph::Load(string filename)
 {
@@ -48,7 +72,7 @@ void Graph::Load(string filename)
 
 			//cout << x << "\t" << y;
 			//getchar();
-			listOfPoints->addToHead(*(new Point(x, y)));
+			listOfPoints->addToTail(*(new Point(x, y)));
 		}
 		if (!plik.eof()) {
 			cout << "I got sth else to read..." << endl;
@@ -81,7 +105,7 @@ void Graph::prepareFiles(fstream& pointFile, fstream& edgeFile)
 	if (!file.good()) cerr << "file corrupted" << endl;*/
 	for (int i = 0; i < listOfPoints->GetSize(); i++)
 	{
-		pointFile << "		" << i << " [pos=\"" << listOfPoints->GetDataOfElement(i).x *5<< "," << listOfPoints->GetDataOfElement(i).y *5<< "!\"]" << std::endl;
+		pointFile << "		" << i << " [pos=\"" << listOfPoints->GetDataOfElement(i).x<< "," << listOfPoints->GetDataOfElement(i).y<< "!\"]" << std::endl;
 	}
 	for (int i = 0; i < listOfEdges->GetSize(); i++)
 	{
