@@ -166,6 +166,37 @@ public:
 		}
 	}
 
+	//remove second node counting from tail (tail is the first node)
+	void RemoveSecondToLast()
+	{
+
+		if (size == 0)
+		{
+			cout << "\nThe list is empty.\n\n";
+		}
+		else
+		{
+			List_Node<T>* temp;
+
+			if (size == 1)
+				delete head;
+			//head = tail = nullptr;
+			else
+			{
+				temp = tail->previous;
+				tail->previous->previous->next = tail;
+				tail->previous = tail->previous->previous;
+
+				delete temp;
+				//tail->next = NULL;
+			}
+
+
+			size--;
+
+		}
+	}
+
 	string GetDataOfElement(int iterator)
 	{
 
