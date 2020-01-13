@@ -1,25 +1,22 @@
 #pragma once
-#include "DynamicArray.h"
-#include "Edge.h"
-#include "Node.h"
+#include "LinkedList.h"
+#include "Point.h"
+using namespace std;
 
 class Graph
 {
-	friend class Node;
-	friend class Edge;
-	friend long long Kruskal(Graph* graph, Graph* finalGraph);
-	friend void DrawSummary(Graph* finalGraph, long long& findCounter);
+	friend class Point;
 
 	static int graphNumber;
-	Dynamic_Array<Node>* nodeArray;
-	Dynamic_Array<Edge>* edgeArray;
+	Linked_List<Point>* listOfPoints;
+	//this list store points which should be connected by edges
+	Linked_List<Point>* listOfEdges;
 
-	void prepareFiles(fstream& nodeFile, fstream& edgeFile);
+	void prepareFiles(fstream& pointFile, fstream& edgeFile);
 public:
 	Graph();	
-	Graph(const Graph* graph);
-	~Graph();	
-	double CountSumOfCost();
+	//Graph(const Graph* graph);
+	~Graph();
 	void Load(string filename);
 	void DrawGraph();
 };

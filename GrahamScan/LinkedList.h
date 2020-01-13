@@ -1,14 +1,12 @@
 #pragma once
-#include <iostream>
 #include <string>
-#include <fstream>
-#include "Point.h"
 using namespace std;
 
 
 template <class T>
 class List_Node
 {
+	friend class Graph;
 public:
 	template <class T> friend class Linked_List;
 	//template <class T> friend void PrintData(List_Node<T>* node);
@@ -25,10 +23,10 @@ public:
 		this->previous = NULL;
 	}
 
-	~List_Node()
+	/*~List_Node()
 	{
 		delete data;
-	}
+	}*/
 
 	T PrintData()
 	{
@@ -53,6 +51,7 @@ public:
 template <class T>
 class Linked_List
 {
+	friend class Graph;
 
 	List_Node<T>* head;
 	List_Node<T>* tail;
@@ -232,8 +231,8 @@ public:
 
 		if (iterator<0 || iterator>size - 1)
 			cout << "\nWrong iterator - out of range.";
-		else if (iterator == size - 1) return tail;//return ToString(tail);//cout << tail->data << endl;
-		else if (iterator == 0) return head;//return ToString(head);//cout << head->data << endl;
+		else if (iterator == size - 1) return tail->data;//return ToString(tail);//cout << tail->data << endl;
+		else if (iterator == 0) return head->data;//return ToString(head);//cout << head->data << endl;
 		else
 		{
 			List_Node<T>* temp = head;
@@ -243,7 +242,7 @@ public:
 				temp = temp->next;
 			}
 
-			return temp;
+			return temp->data;
 			//cout <<  << endl;
 		}
 
@@ -453,7 +452,7 @@ int Compare(T Data1, T Data2)
 	else return 1;
 }
 
-string char_to_str(char c)
-{
-	return string(1, c);
-}
+//string char_to_str(char c)
+//{
+//	return string(1, c);
+//}

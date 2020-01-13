@@ -4,34 +4,24 @@
 #include <fstream>
 #include <direct.h> //_mkdir
 #include <sstream>
-#include "DynamicArray.h"
-#include "Edge.h"
-#include "Node.h"
 #include "Graph.h"
 using namespace std;
 
 int Graph::graphNumber=0;
 Graph::Graph()
 {
-	nodeArray = new Dynamic_Array<Node>();
-	edgeArray = new Dynamic_Array<Edge>();
+	listOfPoints = new Linked_List<Point>();
+	listOfEdges = new Linked_List<Point>();
 }
-Graph::Graph(const Graph* graph)
-{
-	nodeArray = graph->nodeArray;
-	edgeArray = new Dynamic_Array<Edge>();
-}
+//Graph::Graph(const Graph* graph)
+//{
+//	nodeArray = graph->nodeArray;
+//	edgeArray = new Dynamic_Array<Edge>();
+//}
 Graph::~Graph()
 {
-	delete nodeArray;
-	delete edgeArray;
-}
-double Graph::CountSumOfCost()
-{
-	double result = 0;
-	for (int i = 0; i < edgeArray->currentSize; i++)
-		result += (*edgeArray)[i].cost;
-	return result;
+	delete listOfPoints;
+	delete listOfEdges;
 }
 void Graph::Load(string filename)
 {
@@ -42,7 +32,7 @@ void Graph::Load(string filename)
 	if (plik.good())
 	{
 		string line;
-		int number, i1, i2;
+		int number;
 		double x, y;
 
 		plik >> line;
@@ -58,28 +48,8 @@ void Graph::Load(string filename)
 
 			//cout << x << "\t" << y;
 			//getchar();
-			nodeArray->addElement(*(new Node(x, y)));
+			listOfPoints->addToHead(*(new Point(x, y)));
 		}
-		//cout << nodeArray->currentSize << endl;
-
-		plik >> line;
-		//cout << line << endl;
-		number = atoi(line.c_str());
-
-		for (int i = 0; i < number; i++)
-		{
-			plik >> line;
-			i1 = atoi(line.c_str());
-			plik >> line;
-			i2 = atoi(line.c_str());
-			plik >> line;
-			x = atof(line.c_str());
-
-			//cout << i1 << "\t" << i2 << "\t" << x;
-			//getchar();
-			edgeArray->addElement(*(new Edge(i1, i2, x)));
-		}
-		//cout << edgeArray->currentSize << endl;
 		if (!plik.eof()) {
 			cout << "I got sth else to read..." << endl;
 			cout << line << endl;
@@ -104,21 +74,21 @@ void Graph::Load(string filename)
 	}
 }
 
-void Graph::prepareFiles(fstream& nodeFile, fstream& edgeFile)
+void Graph::prepareFiles(fstream& pointFile, fstream& edgeFile)
 {
 	/*ofstream file;
 	file.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\plik.txt", std::ios::out);
 	if (!file.good()) cerr << "file corrupted" << endl;*/
-	for (int i = 0; i < nodeArray->currentSize; i++)
+	for (int i = 0; i < listOfPoints->GetSize(); i++)
 	{
-		nodeFile << "		" << i << " [pos=\"" << (*nodeArray)[i].x * 10 << "," << (*nodeArray)[i].y * 10 << "!\"]" << std::endl;
+		pointFile << "		" << i << " [pos=\"" << listOfPoints->GetDataOfElement(i).x *5<< "," << listOfPoints->GetDataOfElement(i).y *5<< "!\"]" << std::endl;
 	}
-	for (int i = 0; i < edgeArray->currentSize; i++)
+	for (int i = 0; i < listOfEdges->GetSize(); i++)
 	{
 		/*file << " " << (*edgeArray)[i].firstIndex << " -- " << (*edgeArray)[i].secondIndex
 			<< " [label=" <<fixed<< (*edgeArray)[i].cost << "]" << endl;*/
-		edgeFile << " " << (*edgeArray)[i].firstIndex << " -- " << (*edgeArray)[i].secondIndex
-			<<" [label=\"" << (*edgeArray)[i].cost
+		edgeFile << " " << listOfEdges->GetDataOfElement(i).x << " -> " << listOfEdges->GetDataOfElement(i).y
+			//<<" [label=\"" << (*edgeArray)[i].cost
 			//<<" taillabel="<< (*edgeArray)[i].firstIndex
 			//<<" headlabel="<< (*edgeArray)[i].secondIndex
 			<<"\"]" << endl;
@@ -126,33 +96,33 @@ void Graph::prepareFiles(fstream& nodeFile, fstream& edgeFile)
 }
 void Graph::DrawGraph()
 {
-	fstream nodes, edges, out;
+	fstream points, edges, out;
 	string line = "", outName;
 	stringstream ss;
 
-	_mkdir("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph");
-	ss << "\"\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato.exe\" -Tpdf \"C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\out.dot\" -o \"C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\graph"<<graphNumber<<".pdf\"";
-	//"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato.exe" -Tpdf "C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\out.dot" -o "C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\graph.pdf"
+	_mkdir("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph");
+	ss << "\"\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato.exe\" -Tpdf \"C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\out.dot\" -o \"C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\graph"<<graphNumber<<".pdf\"";
+	//"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato.exe" -Tpdf "C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\out.dot" -o "C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\graph.pdf"
 	outName = ss.str();
 	//cout << outName << endl;
-	nodes.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\nodes.txt",std::ios::out|std::ios::in|std::ios::trunc);
-	edges.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\edges.txt",std::ios::out|std::ios::in|std::ios::trunc);
-	out.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\out.dot",std::ios::out|std::ios::in|std::ios::trunc);
+	points.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\nodes.txt",std::ios::out|std::ios::in|std::ios::trunc);
+	edges.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\edges.txt",std::ios::out|std::ios::in|std::ios::trunc);
+	out.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\out.dot",std::ios::out|std::ios::in|std::ios::trunc);
 
-	if (!nodes.good()) cerr << "Open nodes.txt failed!" << endl;
+	if (!points.good()) cerr << "Open nodes.txt failed!" << endl;
 	if (!edges.good()) cerr << "Open edges.txt failed!" << endl;
 	if (!out.good()) cerr << "Open out.dot failed!" << endl;
 
-	prepareFiles(nodes, edges);
+	prepareFiles(points, edges);
 
-	out << "graph D {" << std::endl;
+	out << "digraph D {" << std::endl;
 	out << "	{" << std::endl;
 	//out << "	 node [shape = circle, style=filled, fontsize=10]" << std::endl;
 	out << "	 node [shape = circle, style=filled, width=0.2, fixedsize=true, fontsize=10]" << std::endl;
 	//out << "	 node [shape = point]" << std::endl;
 
-	nodes.seekg(0, std::ios::beg);
-	while (getline(nodes, line)) {
+	points.seekg(0, std::ios::beg);
+	while (getline(points, line)) {
 		out << line << std::endl;
 	}
 	out << "	}" << std::endl;
@@ -160,14 +130,14 @@ void Graph::DrawGraph()
 	while (getline(edges, line)) {
 		out << line << std::endl;
 	}
-	nodes.close();
+	points.close();
 	edges.close();
-	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\nodes.txt");
-	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\edges.txt");
+	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\points.txt");
+	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\edges.txt");
 	out << "}" << std::endl;
 	out.close();
 	system(outName.c_str());
 	graphNumber++;
 
-	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\out.dot");
+	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\out.dot");
 }

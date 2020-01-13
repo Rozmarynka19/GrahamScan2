@@ -1,6 +1,8 @@
 #pragma once
+
 class Point
 {
+	friend class Graph;
 	double x;
 	double y;
 

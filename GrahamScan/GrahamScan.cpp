@@ -1,11 +1,11 @@
 #include <iostream>
-#include "LinkedList.h"
-#include "Point.h"
+#include "Graph.h"
 using namespace std;
 
 int main()
 {
-	Linked_List<Point>* ll = new Linked_List<Point>();
-	ll->Load("points1.txt");
+	Graph* graph = new Graph();
+	graph->Load("points1.txt");
+	graph->DrawGraph();
 	cout << "Hello World!\n";
 }
