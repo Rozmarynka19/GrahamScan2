@@ -52,6 +52,7 @@ void DrawSummary(Graph* graph)
 		<< "Indexes of vertices: " << graph->IndexOfVertexToString()<<endl
 		<< "Time of sorting[s]: " << (SortStop - SortStart) / (double)CLOCKS_PER_SEC << endl
 		<< "Time of main Graham's loop[s]: " << (GrahamStop - GrahamStart) / (double)CLOCKS_PER_SEC << endl
+		<< "Total time[s]: " << ((SortStop - SortStart) / (double)CLOCKS_PER_SEC) + ((GrahamStop - GrahamStart) / (double)CLOCKS_PER_SEC) << endl
 		<< "===================================" << endl;
 }
 
