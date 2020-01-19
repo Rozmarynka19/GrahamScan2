@@ -54,11 +54,11 @@ class Linked_List
 {
 	friend class Graph;
 	template <class T> friend class BinaryHeap;
-
+public:
 	List_Node<T>* head;
 	List_Node<T>* tail;
 	unsigned int size;
-public:
+//public:
 	unsigned int GetSize() { return size; }
 	//public:
 	Linked_List()
@@ -78,12 +78,12 @@ public:
 
 	void Swap(int index1, int index2)
 	{
-		T temp = GetDataOfElement(index1);
-		ReplaceData(index1, GetDataOfElement(index2));
+		T temp = *(GetDataOfElement(index1));
+		ReplaceData(index1, *(GetDataOfElement(index2)));
 		ReplaceData(index2, temp);
 	}
 
-	T* FindStartPoint()
+	/*T* FindStartPoint()
 	{
 		if (size == 0)
 		{
@@ -107,9 +107,9 @@ public:
 		}
 
 		return &(StartPoint->data);
-	}
+	}*/
 
-	void NewCoordinatesSystem(T * StartPoint)
+	/*void NewCoordinatesSystem(T * StartPoint)
 	{
 		List_Node<T>* temp = head;
 
@@ -118,7 +118,7 @@ public:
 			temp->data = temp->data - *StartPoint;
 			temp = temp->next;
 		}
-	}
+	}*/
 
 	//add node to the end of the list
 	void addToTail(T data)
@@ -233,6 +233,13 @@ public:
 			if (size == 1)
 				delete head;
 			//head = tail = nullptr;
+			else if (size == 2)
+			{
+				delete head;
+				tail->previous = nullptr;
+				head->next = nullptr;
+				head = tail;
+			}
 			else
 			{
 				temp = tail->previous;
@@ -271,13 +278,18 @@ public:
 
 	}
 
-	T GetDataOfElement(int iterator)
+	T* GetDataOfElement(int iterator)
 	{
 
 		if (iterator<0 || iterator>size - 1)
-			cout << "\nWrong iterator - out of range.";
-		else if (iterator == size - 1) return tail->data;//return ToString(tail);//cout << tail->data << endl;
-		else if (iterator == 0) return head->data;//return ToString(head);//cout << head->data << endl;
+		{
+			cout << "\nWrong iterator - out of range." << endl;
+			cout << "iterator: " << iterator << " size: " << size << endl;
+			//getchar();
+			return nullptr;
+		}
+		else if (iterator == size - 1) return &(tail->data);//return ToString(tail);//cout << tail->data << endl;
+		else if (iterator == 0) return &(head->data);//return ToString(head);//cout << head->data << endl;
 		else
 		{
 			List_Node<T>* temp = head;
@@ -287,7 +299,7 @@ public:
 				temp = temp->next;
 			}
 
-			return temp->data;
+			return &(temp->data);
 			//cout <<  << endl;
 		}
 

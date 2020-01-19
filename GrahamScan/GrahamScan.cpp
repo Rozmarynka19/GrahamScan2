@@ -1,48 +1,122 @@
 #include <iostream>
 #include "Graph.h"
+#include "Point.h"
+#include "DynamicArray.h"
 #include "HeapSort.h"
 using namespace std;
 
-void GrahamScan(Graph* graph, Linked_List<Point>* LinkedList)
+void GrahamScan(Graph* graph, Dynamic_Array<Point>* PointsCopy)
 {
-	Point* StartPoint = LinkedList->FindStartPoint();
-	//cout << "startpoint: " << StartPoint->x << "\t" << StartPoint->y << endl;
-	if (LinkedList->SearchAndDestoryNode(*StartPoint, Compare<Point>)) cout << "Removing StartPoint failed!" << endl;
+	Point* StartPoint = graph->GetStartPoint();
+	//cout << StartPoint->label << ": " << StartPoint->x << "," << StartPoint->y << endl;
 
-	graph->listOfEdges->addToTail(*StartPoint);
-	Point p = graph->listOfEdges->GetDataOfElement(0);
-	cout << p.x << "\t" << p.y << endl;
-	LinkedList->NewCoordinatesSystem(StartPoint);
+	//copy of points without StartPoint
+	graph->MakeCopyOfPoints(PointsCopy, *StartPoint);
 
-	BinaryHeap<Point>* binaryHeap = new BinaryHeap<Point>(LinkedList, true, false);
-	binaryHeap->HeapSort();
-
-	graph->listOfEdges->addToTail(LinkedList->GetDataOfElement(0));
-	for (int i = 1; i < LinkedList->GetSize(); i++)
+	/*cout << "PointsCopy's Size: " << PointsCopy->currentSize << endl;
+	for (int i = 0; i < PointsCopy->currentSize; i++)
 	{
-		graph->listOfEdges->addToTail(LinkedList->GetDataOfElement(i));
+		cout << PointsCopy->getData(i).label << ": " << PointsCopy->getData(i).x << ", " << PointsCopy->getData(i).y << endl;
+	}*/
+
+
+	PointsCopy->NewCoordinatesSystem(*StartPoint);
+
+	/*cout << "PointsCopy's Size: " << PointsCopy->currentSize << endl;
+	for (int i = 0; i < PointsCopy->currentSize; i++)
+	{
+		cout << PointsCopy->getData(i).label << ": " << PointsCopy->getData(i).x << ", " << PointsCopy->getData(i).y << endl;
+		getchar();
+	}*/
+
+	BinaryHeap<Point>* binaryHeap = new BinaryHeap<Point>(PointsCopy, true, false);
+	/*for (int i = 0; i < PointsCopy->currentSize; i++)
+	{
+		cout << PointsCopy->getData(i).label << ": " << PointsCopy->getData(i).x << ", " << PointsCopy->getData(i).y << " " << PointsCopy->getData(i).x / PointsCopy->getData(i).y << endl;
+		getchar();
+	}*/
+	//cout << "OK" << endl;
+	binaryHeap->HeapSort();
+	
+	cout << "PointsCopy's Size: " << PointsCopy->currentSize << endl;
+	/*for (int i = 0; i < PointsCopy->currentSize; i++)
+	{
+		cout << PointsCopy->getData(i).label << ": " << PointsCopy->getData(i).x << ", " << PointsCopy->getData(i).y << " " << PointsCopy->getData(i).x / PointsCopy->getData(i).y << endl;
+		getchar();
+	}*/
+	
+
+
+	cout << "Przed petla" << endl;
+	graph->AddVertexToHull(*StartPoint-*StartPoint);
+	graph->AddVertexToHull(PointsCopy->getData(0));
+	for (int i = 1; i < PointsCopy->currentSize; i++)
+	{
+		graph->AddVertexToHull(PointsCopy->getData(i));
 		//dopoki zakret w prawo
-		while (Compare(graph->listOfEdges->GetDataOfElement(graph->listOfEdges->GetSize()-1) - graph->listOfEdges->GetDataOfElement(graph->listOfEdges->GetSize() - 2),
-			graph->listOfEdges->GetDataOfElement(graph->listOfEdges->GetSize() - 2) - graph->listOfEdges->GetDataOfElement(graph->listOfEdges->GetSize() - 3)))
+			while (Compare(graph->GetVertex(graph->GetNumberOfVertex() - 1) - graph->GetVertex(graph->GetNumberOfVertex() - 2),
+				graph->GetVertex(graph->GetNumberOfVertex() - 2) - graph->GetVertex(graph->GetNumberOfVertex() - 3)) == -1)
 		{
-			graph->listOfEdges->RemoveSecondToLast();
+			graph->RemoveSecondToLastVertex();
 		}
 	}
+	
+	delete binaryHeap;
 }
+
 
 
 
 int main()
 {
 	Graph* graph = new Graph();
-	Linked_List<Point>* LinkedList = new Linked_List<Point>();
+	Dynamic_Array<Point>* PointsCopy = new Dynamic_Array<Point>();
 
-	graph->Load("points1.txt");
-
-	graph->CopyListOfPoints(LinkedList);
-	GrahamScan(graph, LinkedList);
+	graph->Load("points5.txt");
 	//graph->Print();
-	graph->DrawGraph();
+
+	GrahamScan(graph, PointsCopy);
+	graph->PrintVertex();
+	//graph->DrawGraph();
+
 
 	cout << "Hello World!\n";
+	delete graph, PointsCopy;
+
+	//////////////////////////////////////////////////////////
+
+	//Dynamic_Array<int>* ar = new Dynamic_Array<int>();
+	//ar->addElement(10);
+	//ar->addElement(250);
+	//ar->addElement(2340);
+	//ar->addElement(530);
+	//ar->addElement(30);
+	//ar->addElement(53);
+	//ar->addElement(23);
+	//ar->addElement(64);
+	//ar->addElement(5);
+	//ar->addElement(56);
+
+	//for (int i = 0; i < ar->currentSize; i++)
+	//	cout << ar->getData(i) << endl;
+
+	//cout << endl;
+	//cout << endl;
+
+
+	//BinaryHeap<int>* bh = new BinaryHeap<int>(ar, false, false);
+	//
+
+	//for (int i = 0; i < ar->currentSize; i++)
+	//	cout << ar->getData(i) << endl;
+
+	//cout << endl;
+	//	cout << endl;
+
+	//bh->HeapSort();
+
+	//for (int i = 0; i < ar->currentSize; i++)
+	//	cout << ar->getData(i) << endl;
+
+	//delete ar, bh;
 }

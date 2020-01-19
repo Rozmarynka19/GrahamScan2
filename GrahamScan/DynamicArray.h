@@ -6,6 +6,8 @@ using namespace std;
 template <class T>
 class Dynamic_Array
 {
+	friend void GrahamScan(Graph* graph, Dynamic_Array<T>* PointsCopy);
+
 	T* array;
 	int maxSize;
 
@@ -80,8 +82,8 @@ public:
 		}
 		else
 		{
-			//cerr << "Retrieving failed - index out of range" << endl;
-			//return NULL;
+			cerr << "Retrieving failed - index out of range" << endl;
+			return T();
 		}
 	}
 
@@ -137,6 +139,44 @@ public:
 		T temp = array[index1];
 		array[index1] = array[index2];
 		array[index2] = temp;
+	}
+
+	T* FindStartPoint()
+	{
+		if (currentSize == 0)
+		{
+			cout << "Dynamic_Array::FindStartPoint error: The list is empty!" << endl;
+			return nullptr;
+		}
+		
+		int IndexOfStartPoint = 0;
+
+		for (int i = 1; i < currentSize; i++)
+		{
+			if (array[i].y < array[IndexOfStartPoint].y) IndexOfStartPoint = i;
+			else if (array[i].y == array[IndexOfStartPoint].y)
+			{
+				if(array[i].x < array[IndexOfStartPoint].x) IndexOfStartPoint = i;
+			}
+		}
+		return &(array[IndexOfStartPoint]);
+	}
+	void CopyWithout(Dynamic_Array<T>* Target, T Without)
+	{
+		for (int i = 0; i < currentSize; i++)
+		{
+			if ((array[i].x == Without.x) && (array[i].y == Without.y)) continue;
+
+			Target->addElement(array[i]);
+		}
+	}
+
+	void NewCoordinatesSystem(T StartPoint)
+	{
+		for (int i = 0; i < currentSize; i++)
+		{
+			array[i] = array[i] - StartPoint;
+		}
 	}
 };
 

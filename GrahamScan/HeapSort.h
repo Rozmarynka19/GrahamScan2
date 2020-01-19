@@ -31,7 +31,7 @@ class BinaryHeap
 		}
 		else if (isList)
 		{
-			if (2 * index + 2 > linkedList->size)
+			if (2 * index + 2 > arrayCurrentSize)
 				return true;
 			else
 				return false;
@@ -86,15 +86,34 @@ class BinaryHeap
 		{
 			while (!isLeaf(index))
 			{
-				if (dynamicArray->getData(GetLeftChildIndex(index)) > dynamicArray->getData(GetRightChildIndex(index)))
+				T left = dynamicArray->getData(GetLeftChildIndex(index));
+				T right = dynamicArray->getData(GetRightChildIndex(index));
+
+				if (left.label != -1 && right.label != -1)
+				{
+					if (Compare(left, right) == 1)
+					//if (left >right )
+						greater = GetLeftChildIndex(index);
+					else
+						greater = GetRightChildIndex(index);
+
+					if (Compare(dynamicArray->getData(greater), dynamicArray->getData(index)) == 1)
+					//if (dynamicArray->getData(greater) > dynamicArray->getData(index))
+						dynamicArray->Swap(greater, index);
+
+					index = greater;
+				}
+				else if(right.label == -1)
+				{
 					greater = GetLeftChildIndex(index);
-				else
-					greater = GetRightChildIndex(index);
 
-				if (dynamicArray->getData(greater) > dynamicArray->getData(index))
-					dynamicArray->Swap(index, greater);
+					if (Compare(dynamicArray->getData(greater), dynamicArray->getData(index)) == 1)
+					//if (dynamicArray->getData(greater) > dynamicArray->getData(index))
+						dynamicArray->Swap(greater, index);
 
-				index = greater;
+					index = greater;
+				}
+				
 			}
 
 		}
@@ -102,12 +121,12 @@ class BinaryHeap
 		{
 			while (!isLeaf(index))
 			{
-				if (linkedList->GetDataOfElement(GetLeftChildIndex(index)).y > linkedList->GetDataOfElement(GetRightChildIndex(index)).y)
+				if (Compare(linkedList->GetDataOfElement(GetRightChildIndex(index)), linkedList->GetDataOfElement(GetLeftChildIndex(index))) == 1)
 					greater = GetLeftChildIndex(index);
 				else
 					greater = GetRightChildIndex(index);
 
-				if (linkedList->GetDataOfElement(greater).y > linkedList->GetDataOfElement(index).y)
+				if (Compare(linkedList->GetDataOfElement(index), linkedList->GetDataOfElement(greater)) == 1)
 					linkedList->Swap(index, greater);
 
 				index = greater;
@@ -151,7 +170,7 @@ class BinaryHeap
 public:
 	BinaryHeap() { isDynamic = true; dynamicArray = new Dynamic_Array<T>; }
 	//linked list
-	BinaryHeap(Linked_List<T>* ll, bool toDelete, bool directionOfRepair)
+	BinaryHeap(Linked_List<T> * ll, bool toDelete, bool directionOfRepair)
 	{
 		isDynamic = false;
 		isList = true;
@@ -189,8 +208,11 @@ public:
 		dynamicArray = array;
 		arrayMaxSize = arrayCurrentSize = array->currentSize;
 
-		//array repairing
-		//if true top-down; false - bottom-up
+		/*for (int i = 0; i < dynamicArray->currentSize; i++)
+			cout <<"array index: "<< i<<"Point index"<< dynamicArray->getData(i).label << ": " << dynamicArray->getData(i).x << ", " << dynamicArray->getData(i).y << endl;*/
+
+			//array repairing
+			//if true top-down; false - bottom-up
 		if (directionOfRepair)
 		{
 			for (int i = 0; i < arrayCurrentSize; i++) {
@@ -236,7 +258,7 @@ public:
 		}
 	}
 	//only for DynamicArray
-	~BinaryHeap() 
+	~BinaryHeap()
 	{
 		if (isDynamic && willBeDeleted) dynamicArray->~Dynamic_Array();
 		if (isList && willBeDeleted) linkedList->~Linked_List();

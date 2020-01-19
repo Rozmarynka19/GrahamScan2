@@ -3,14 +3,16 @@
 #include <fstream>
 #include <direct.h> //_mkdir
 #include <sstream>
+//#include "DynamicArray.h"
 #include "Graph.h"
+//#include "Point.h"
 using namespace std;
 
 int Graph::graphNumber=0;
 Graph::Graph()
 {
-	listOfPoints = new Linked_List<Point>();
-	listOfEdges = new Linked_List<Point>();
+	Points = new Dynamic_Array<Point>();
+	VertexOfHull = new Linked_List<Point>();
 }
 //Graph::Graph(const Graph* graph)
 //{
@@ -19,33 +21,55 @@ Graph::Graph()
 //}
 Graph::~Graph()
 {
-	delete listOfPoints;
-	delete listOfEdges;
+	delete Points;
+	delete VertexOfHull;
 }
 //unsigned int Graph::GetListOfPointsSize()
 //{
 //	return listOfPoints->GetSize();
 //}
-//unsigned int Graph::GetListOfEdgesSize()
-//{
-//	return listOfEdges->GetSize();
-//}
-void Graph::CopyListOfPoints(Linked_List<Point>* LinkedList)
+unsigned int Graph::GetNumberOfVertex()
 {
-	for (int i = 0; i < listOfPoints->GetSize(); i++)
-	{
-		LinkedList->addToTail(listOfPoints->GetDataOfElement(i));
-	}
+	return VertexOfHull->GetSize();
+}
+void Graph::MakeCopyOfPoints(Dynamic_Array<Point>* PointsCopy, Point StartPoint)
+{
+	Points->CopyWithout(PointsCopy, StartPoint);
+}
+void Graph::AddVertexToHull(Point vertex)
+{
+	VertexOfHull->addToTail(vertex);
+}
+void Graph::RemoveSecondToLastVertex()
+{
+	VertexOfHull->RemoveSecondToLast();
+}
+Point Graph::GetVertex(int index)
+{
+	return *(VertexOfHull->GetDataOfElement(index));
 }
 void Graph::Print()
 {
-	List_Node<Point>* tmp = listOfEdges->head;
-	for (int i = 0; i < listOfEdges->size; i++)
+	for (int i = 0; i < Points->currentSize; i++)
 	{
-		cout << tmp->data.x << "\t" << tmp->data.y << endl;
-		tmp = tmp->next;
-		getchar();
+		cout <<Points->getData(i).label << ": " << Points->getData(i).x << "," << Points->getData(i).y << endl;
 	}
+}
+void Graph::PrintVertex()
+{
+	List_Node<Point>* tmp = VertexOfHull->head;
+	cout << "VertexOfHull's Size: " << VertexOfHull->GetSize() << endl;
+	/*cout << "Press ENTER to continue... " << endl;
+	getchar();*/
+	for (int i = 0; i < VertexOfHull->size; i++)
+	{
+		cout <<tmp->data.label<<": "<< tmp->data.x << ", " << tmp->data.y << endl;
+		tmp = tmp->next;
+	}
+}
+Point* Graph::GetStartPoint()
+{
+	return Points->FindStartPoint();
 }
 void Graph::Load(string filename)
 {
@@ -72,7 +96,7 @@ void Graph::Load(string filename)
 
 			//cout << x << "\t" << y;
 			//getchar();
-			listOfPoints->addToTail(*(new Point(x, y)));
+			Points->addElement(*(new Point(x, y,i)));
 		}
 		if (!plik.eof()) {
 			cout << "I got sth else to read..." << endl;
@@ -98,46 +122,48 @@ void Graph::Load(string filename)
 	}
 }
 
-void Graph::prepareFiles(fstream& pointFile, fstream& edgeFile)
+void Graph::prepareFiles(fstream& pointFile, fstream& vertexFile)
 {
 	/*ofstream file;
 	file.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\7.KruskalAndUF\\graph\\plik.txt", std::ios::out);
 	if (!file.good()) cerr << "file corrupted" << endl;*/
-	for (int i = 0; i < listOfPoints->GetSize(); i++)
+	for (int i = 0; i < Points->currentSize; i++)
 	{
-		pointFile << "		" << i << " [pos=\"" << listOfPoints->GetDataOfElement(i).x<< "," << listOfPoints->GetDataOfElement(i).y<< "!\"]" << std::endl;
+		pointFile << "		" << Points->getData(i).label << " [pos=\"" << Points->getData(i).x * 5<< "," << Points->getData(i).y * 5 << "!\"]" << endl;
 	}
-	for (int i = 0; i < listOfEdges->GetSize(); i++)
+	for (int i = 1; i < VertexOfHull->GetSize(); i++)
 	{
 		/*file << " " << (*edgeArray)[i].firstIndex << " -- " << (*edgeArray)[i].secondIndex
 			<< " [label=" <<fixed<< (*edgeArray)[i].cost << "]" << endl;*/
-		edgeFile << " " << listOfEdges->GetDataOfElement(i).x << " -> " << listOfEdges->GetDataOfElement(i).y
+		vertexFile << " " << VertexOfHull->GetDataOfElement(i-1)->label << " -> " << VertexOfHull->GetDataOfElement(i)->label
 			//<<" [label=\"" << (*edgeArray)[i].cost
 			//<<" taillabel="<< (*edgeArray)[i].firstIndex
 			//<<" headlabel="<< (*edgeArray)[i].secondIndex
-			<<"\"]" << endl;
+			//<<"\"]"
+			<< endl;
 	}
+	vertexFile << " " << VertexOfHull->GetDataOfElement(VertexOfHull->GetSize() - 1)->label << " -> " << VertexOfHull->GetDataOfElement(0)->label << endl;
 }
 void Graph::DrawGraph()
 {
-	fstream points, edges, out;
+	fstream points, vertex, out;
 	string line = "", outName;
 	stringstream ss;
 
-	_mkdir("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph");
-	ss << "\"\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato.exe\" -Tpdf \"C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\out.dot\" -o \"C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\graph"<<graphNumber<<".pdf\"";
-	//"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato.exe" -Tpdf "C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\out.dot" -o "C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\graph.pdf"
+	_mkdir("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph");
+	ss << "\"\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato.exe\" -Tpdf \"C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\out.dot\" -o \"C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\graph"<<graphNumber<<".pdf\"";
+	//"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato.exe" -Tpdf "C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\out.dot" -o "C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\graph.pdf"
 	outName = ss.str();
 	//cout << outName << endl;
-	points.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\nodes.txt",std::ios::out|std::ios::in|std::ios::trunc);
-	edges.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\edges.txt",std::ios::out|std::ios::in|std::ios::trunc);
-	out.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\out.dot",std::ios::out|std::ios::in|std::ios::trunc);
+	points.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\points.txt",std::ios::out|std::ios::in|std::ios::trunc);
+	vertex.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\vertex.txt",std::ios::out|std::ios::in|std::ios::trunc);
+	out.open("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\out.dot",std::ios::out|std::ios::in|std::ios::trunc);
 
-	if (!points.good()) cerr << "Open nodes.txt failed!" << endl;
-	if (!edges.good()) cerr << "Open edges.txt failed!" << endl;
+	if (!points.good()) cerr << "Open points.txt failed!" << endl;
+	if (!vertex.good()) cerr << "Open vertex.txt failed!" << endl;
 	if (!out.good()) cerr << "Open out.dot failed!" << endl;
 
-	prepareFiles(points, edges);
+	prepareFiles(points, vertex);
 
 	out << "digraph D {" << std::endl;
 	out << "	{" << std::endl;
@@ -150,18 +176,18 @@ void Graph::DrawGraph()
 		out << line << std::endl;
 	}
 	out << "	}" << std::endl;
-	edges.seekg(0, std::ios::beg);
-	while (getline(edges, line)) {
+	vertex.seekg(0, std::ios::beg);
+	while (getline(vertex, line)) {
 		out << line << std::endl;
 	}
 	points.close();
-	edges.close();
-	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\points.txt");
-	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\edges.txt");
+	vertex.close();
+	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\points.txt");
+	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\vertex.txt");
 	out << "}" << std::endl;
 	out.close();
 	system(outName.c_str());
 	graphNumber++;
 
-	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan\\graph\\out.dot");
+	//remove("C:\\Users\\Lara\\Desktop\\Algorytmy2\\Laboratoria\\GrahamScan2\\graph\\out.dot");
 }
